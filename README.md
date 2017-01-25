@@ -1,5 +1,7 @@
 # QuNect-Razor
-A free tool to examine fields in QuickBase (http://www.quickbase.com) tables.
+A free tool written in VB.Net to examine fields in QuickBase (http://www.quickbase.com) tables.
+
+This project illustrates how to use System.Data.Odbc to read schema information from QuickBase tables.
 
 QuNect Razor can:
 
