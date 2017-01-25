@@ -1,6 +1,6 @@
 # QuNect-Razor
 A free tool written in VB.Net to examine fields in QuickBase (http://www.quickbase.com) tables.
-Uses the .Net Framework 4.5
+Uses the .Net Framework version 4.5
 This project illustrates how to use System.Data.Odbc to read schema information from QuickBase tables.
 
 QuNect Razor can:
