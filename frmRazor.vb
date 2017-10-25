@@ -7,7 +7,7 @@ Imports System.Text.RegularExpressions
 Imports System.Threading
 Public Class frmRazor
     Private Const AppName = "QuNectRazor"
-    Private Const qunectRazorVersion = "1.0.0.7"
+    Private Const qunectRazorVersion = "1.0.0.10"
     Private cmdLineArgs() As String
     Private automode As Boolean = False
     Private connectionString As String = ""
