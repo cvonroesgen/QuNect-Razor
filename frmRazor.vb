@@ -7,7 +7,7 @@ Imports System.Text.RegularExpressions
 Imports System.Threading
 Public Class frmRazor
     Private Const AppName = "QuNectRazor"
-    Private Const qunectRazorVersion = "1.0.0.10"
+    Private Const qunectRazorVersion = "1.0.0.13"
     Private cmdLineArgs() As String
     Private automode As Boolean = False
     Private connectionString As String = ""
@@ -32,6 +32,7 @@ Public Class frmRazor
         tvFields.Visible = False
         lblResult.Visible = False
         txtUsername.Text = GetSetting(AppName, "Credentials", "username")
+        cmbPassword.SelectedIndex = CInt(GetSetting(AppName, "Credentials", "passwordOrToken", "0"))
         txtPassword.Text = GetSetting(AppName, "Credentials", "password")
         txtServer.Text = GetSetting(AppName, "Credentials", "server", "www.quickbase.com")
         txtAppToken.Text = GetSetting(AppName, "Credentials", "apptoken", "b2fr52jcykx3tnbwj8s74b8ed55b")
@@ -94,26 +95,34 @@ Public Class frmRazor
     End Sub
     Private Sub listTables()
         Me.Cursor = Cursors.WaitCursor
-        tvAppsTables.Visible = True
+
 
         Dim quNectConn As OdbcConnection = getquNectConn("all")
         If Not quNectConn Is Nothing Then
+            tvAppsTables.Visible = True
             Dim tables As DataTable = quNectConn.GetSchema("Tables")
             listTablesFromGetSchema(tables)
             quNectConn.Dispose()
         End If
+        Me.Cursor = Cursors.Default
     End Sub
     Private Function getquNectConn(fieldCharacterSetting As String) As OdbcConnection
-        Dim connectionString As String = buildConnectionString(fieldCharacterSetting)
+        Dim connectionString As String = ""
+        Try
+            connectionString = buildConnectionString(fieldCharacterSetting)
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.OkOnly, AppName)
+            Return Nothing
+        End Try
         Dim quNectConn As OdbcConnection = New OdbcConnection(connectionString)
         Try
             quNectConn.Open()
         Catch excpt As Exception
             Me.Cursor = Cursors.Default
             If excpt.Message.StartsWith("ERROR [IM003]") Or excpt.Message.Contains("Data source name not found") Then
-                MsgBox("Please install QuNect ODBC for QuickBase from http://qunect.com/download/QuNect.exe and try again.")
+                MsgBox("Please install QuNect ODBC for QuickBase from http://qunect.com/download/QuNect.exe and try again.", MsgBoxStyle.OkOnly, AppName)
             Else
-                MsgBox(excpt.Message.Substring(13))
+                MsgBox(excpt.Message.Substring(13), MsgBoxStyle.OkOnly, AppName)
             End If
             Return Nothing
             Exit Function
@@ -125,7 +134,7 @@ Public Class frmRazor
         qdbVer.major = CInt(m.Groups(2).Value)
         qdbVer.minor = CInt(m.Groups(3).Value)
         If (qdbVer.year < 15) Or ((qdbVer.year = 15) And ((qdbVer.major <= 5) And (qdbVer.minor < 78))) Then
-            MsgBox("You are running the " & ver & " version of QuNect ODBC for QuickBase. Please install the latest version from http://qunect.com/download/QuNect.exe")
+            MsgBox("You are running the " & ver & " version of QuNect ODBC for QuickBase. Please install the latest version from http://qunect.com/download/QuNect.exe", MsgBoxStyle.OkOnly, AppName)
             quNectConn.Dispose()
             Me.Cursor = Cursors.Default
             Return Nothing
@@ -136,7 +145,7 @@ Public Class frmRazor
     Sub timeoutCallback(ByVal result As System.IAsyncResult)
         If Not automode Then
             Me.Cursor = Cursors.Default
-            MsgBox("Operation timed out. Please try again.")
+            MsgBox("Operation timed out. Please try again.", MsgBoxStyle.OkOnly, AppName)
         End If
     End Sub
     Sub listTablesFromGetSchema(tables As DataTable)
@@ -216,18 +225,33 @@ Public Class frmRazor
         If appdbid.Length Then
             buildConnectionString &= ";APPID=" & appdbid & ";APPNAME=" & qdbAppName
         End If
+        If cmbPassword.SelectedIndex = 0 Then
+            cmbPassword.Focus()
+            Throw New System.Exception("Please indicate whether you are using a password or a user token.")
+            Return ""
+        ElseIf cmbPassword.SelectedIndex = 1 Then
+            buildConnectionString &= ";PWDISPASSWORD=1"
+        Else
+            buildConnectionString &= ";PWDISPASSWORD=0"
+        End If
     End Function
     Private Sub razor()
         'here we need to go through the list and razor
+        Dim connectionString As String = ""
+        Try
+            connectionString = buildConnectionString("all")
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.OkOnly, AppName)
+            Exit Sub
+        End Try
         Me.Cursor = Cursors.WaitCursor
-        Dim connectionString As String = buildConnectionString("all")
         Dim quNectConnFIDs As OdbcConnection = New OdbcConnection(connectionString & ";usefids=1")
 
         Try
             quNectConnFIDs.Open()
         Catch excpt As Exception
             If Not automode Then
-                MsgBox(excpt.Message())
+                MsgBox(excpt.Message(), MsgBoxStyle.OkOnly, AppName)
             End If
             quNectConnFIDs.Dispose()
             Me.Cursor = Cursors.Default
@@ -239,7 +263,7 @@ Public Class frmRazor
             quNectConn.Open()
         Catch excpt As Exception
             If Not automode Then
-                MsgBox(excpt.Message())
+                MsgBox(excpt.Message(), MsgBoxStyle.OkOnly, AppName)
             End If
             quNectConn.Dispose()
             Me.Cursor = Cursors.Default
@@ -328,7 +352,7 @@ Public Class frmRazor
     End Sub
     Private Sub ContextMenuStrip1_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles ContextMenuStrip1.ItemClicked
         If (qdbVer.year < 16) Or ((qdbVer.year = 16) And ((qdbVer.major <= 6) And (qdbVer.minor < 20))) Then
-            MsgBox("To access this feature please install the latest version from http://qunect.com/download/QuNect.exe")
+            MsgBox("To access this feature please install the latest version from http://qunect.com/download/QuNect.exe", MsgBoxStyle.OkOnly, AppName)
             Exit Sub
         End If
         'here we need to reconnect with the appid in the connection string
@@ -370,10 +394,10 @@ Public Class frmRazor
                 tvFields.Visible = True
                 listFields()
             Else
-                MsgBox("Please Choose a Test")
+                MsgBox("Please Choose a Test", MsgBoxStyle.OkOnly, AppName)
             End If
         Catch ex As Exception
-            MsgBox("Sorry we could not perform your analysis because: " & ex.Message)
+            MsgBox("Sorry we could not perform your analysis because: " & ex.Message, MsgBoxStyle.OkOnly, AppName)
         End Try
         Me.Cursor = Cursors.Default
         tvAppsTables.Focus()
@@ -577,6 +601,13 @@ Public Class frmRazor
         quNectConn.Dispose()
 
     End Function
-
+    Private Sub cmbPassword_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbPassword.SelectedIndexChanged
+        SaveSetting(AppName, "Credentials", "passwordOrToken", cmbPassword.SelectedIndex)
+        If cmbPassword.SelectedIndex = 0 Then
+            txtPassword.Enabled = False
+        Else
+            txtPassword.Enabled = True
+        End If
+    End Sub
 End Class
 

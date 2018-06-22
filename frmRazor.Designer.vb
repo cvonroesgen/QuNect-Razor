@@ -36,7 +36,6 @@ Partial Class frmRazor
         Me.txtAppToken = New System.Windows.Forms.TextBox()
         Me.lblServer = New System.Windows.Forms.Label()
         Me.txtServer = New System.Windows.Forms.TextBox()
-        Me.lblPassword = New System.Windows.Forms.Label()
         Me.txtPassword = New System.Windows.Forms.TextBox()
         Me.lblUsername = New System.Windows.Forms.Label()
         Me.txtUsername = New System.Windows.Forms.TextBox()
@@ -44,6 +43,7 @@ Partial Class frmRazor
         Me.cmbTests = New System.Windows.Forms.ComboBox()
         Me.lblResult = New System.Windows.Forms.Label()
         Me.tvFields = New System.Windows.Forms.TreeView()
+        Me.cmbPassword = New System.Windows.Forms.ComboBox()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -125,7 +125,7 @@ Partial Class frmRazor
         'lblServer
         '
         Me.lblServer.AutoSize = True
-        Me.lblServer.Location = New System.Drawing.Point(287, 12)
+        Me.lblServer.Location = New System.Drawing.Point(295, 12)
         Me.lblServer.Name = "lblServer"
         Me.lblServer.Size = New System.Drawing.Size(93, 13)
         Me.lblServer.TabIndex = 30
@@ -133,26 +133,17 @@ Partial Class frmRazor
         '
         'txtServer
         '
-        Me.txtServer.Location = New System.Drawing.Point(284, 31)
+        Me.txtServer.Location = New System.Drawing.Point(295, 31)
         Me.txtServer.Name = "txtServer"
-        Me.txtServer.Size = New System.Drawing.Size(237, 20)
+        Me.txtServer.Size = New System.Drawing.Size(226, 20)
         Me.txtServer.TabIndex = 29
-        '
-        'lblPassword
-        '
-        Me.lblPassword.AutoSize = True
-        Me.lblPassword.Location = New System.Drawing.Point(151, 12)
-        Me.lblPassword.Name = "lblPassword"
-        Me.lblPassword.Size = New System.Drawing.Size(108, 13)
-        Me.lblPassword.TabIndex = 28
-        Me.lblPassword.Text = "QuickBase Password"
         '
         'txtPassword
         '
         Me.txtPassword.Location = New System.Drawing.Point(148, 31)
         Me.txtPassword.Name = "txtPassword"
         Me.txtPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
-        Me.txtPassword.Size = New System.Drawing.Size(120, 20)
+        Me.txtPassword.Size = New System.Drawing.Size(141, 20)
         Me.txtPassword.TabIndex = 27
         '
         'lblUsername
@@ -206,11 +197,22 @@ Partial Class frmRazor
         Me.tvFields.Size = New System.Drawing.Size(429, 642)
         Me.tvFields.TabIndex = 53
         '
+        'cmbPassword
+        '
+        Me.cmbPassword.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cmbPassword.FormattingEnabled = True
+        Me.cmbPassword.Items.AddRange(New Object() {"Please choose...", "QuickBase Password", "QuickBase User Token"})
+        Me.cmbPassword.Location = New System.Drawing.Point(148, 4)
+        Me.cmbPassword.Name = "cmbPassword"
+        Me.cmbPassword.Size = New System.Drawing.Size(141, 21)
+        Me.cmbPassword.TabIndex = 77
+        '
         'frmRazor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(864, 804)
+        Me.Controls.Add(Me.cmbPassword)
         Me.Controls.Add(Me.tvFields)
         Me.Controls.Add(Me.lblResult)
         Me.Controls.Add(Me.cmbTests)
@@ -224,7 +226,6 @@ Partial Class frmRazor
         Me.Controls.Add(Me.txtAppToken)
         Me.Controls.Add(Me.lblServer)
         Me.Controls.Add(Me.txtServer)
-        Me.Controls.Add(Me.lblPassword)
         Me.Controls.Add(Me.txtPassword)
         Me.Controls.Add(Me.lblUsername)
         Me.Controls.Add(Me.txtUsername)
@@ -248,7 +249,6 @@ End Sub
     Friend WithEvents txtAppToken As System.Windows.Forms.TextBox
     Friend WithEvents lblServer As System.Windows.Forms.Label
     Friend WithEvents txtServer As System.Windows.Forms.TextBox
-    Friend WithEvents lblPassword As System.Windows.Forms.Label
     Friend WithEvents txtPassword As System.Windows.Forms.TextBox
     Friend WithEvents lblUsername As System.Windows.Forms.Label
     Friend WithEvents txtUsername As System.Windows.Forms.TextBox
@@ -256,4 +256,5 @@ End Sub
     Friend WithEvents cmbTests As System.Windows.Forms.ComboBox
     Friend WithEvents lblResult As System.Windows.Forms.Label
     Friend WithEvents tvFields As TreeView
+    Friend WithEvents cmbPassword As ComboBox
 End Class
