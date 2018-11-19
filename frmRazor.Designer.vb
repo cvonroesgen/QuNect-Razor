@@ -43,6 +43,7 @@ Partial Class frmRazor
         Me.lblResult = New System.Windows.Forms.Label()
         Me.tvFields = New System.Windows.Forms.TreeView()
         Me.cmbPassword = New System.Windows.Forms.ComboBox()
+        Me.btnAppToken = New System.Windows.Forms.Button()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -196,11 +197,21 @@ Partial Class frmRazor
         Me.cmbPassword.Size = New System.Drawing.Size(187, 21)
         Me.cmbPassword.TabIndex = 77
         '
+        'btnAppToken
+        '
+        Me.btnAppToken.Location = New System.Drawing.Point(163, 59)
+        Me.btnAppToken.Name = "btnAppToken"
+        Me.btnAppToken.Size = New System.Drawing.Size(19, 20)
+        Me.btnAppToken.TabIndex = 78
+        Me.btnAppToken.Text = "?"
+        Me.btnAppToken.UseVisualStyleBackColor = True
+        '
         'frmRazor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(864, 804)
+        Me.Controls.Add(Me.btnAppToken)
         Me.Controls.Add(Me.cmbPassword)
         Me.Controls.Add(Me.tvFields)
         Me.Controls.Add(Me.lblResult)
@@ -244,4 +255,5 @@ End Sub
     Friend WithEvents lblResult As System.Windows.Forms.Label
     Friend WithEvents tvFields As TreeView
     Friend WithEvents cmbPassword As ComboBox
+    Friend WithEvents btnAppToken As Button
 End Class

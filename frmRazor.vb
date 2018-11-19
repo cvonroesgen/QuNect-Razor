@@ -7,7 +7,7 @@ Imports System.Text.RegularExpressions
 Imports System.Threading
 Public Class frmRazor
     Private Const AppName = "QuNectRazor"
-    Private Const qunectRazorVersion = "1.0.0.15"
+    Private Const qunectRazorVersion = "1.0.0.16"
     Private cmdLineArgs() As String
     Private automode As Boolean = False
     Private connectionString As String = ""
@@ -34,7 +34,7 @@ Public Class frmRazor
         cmbPassword.SelectedIndex = CInt(GetSetting(AppName, "Credentials", "passwordOrToken", "0"))
         txtPassword.Text = GetSetting(AppName, "Credentials", "password")
         txtServer.Text = GetSetting(AppName, "Credentials", "server", "www.quickbase.com")
-        txtAppToken.Text = GetSetting(AppName, "Credentials", "apptoken", "b2fr52jcykx3tnbwj8s74b8ed55b")
+        txtAppToken.Text = GetSetting(AppName, "Credentials", "apptoken", "")
         Dim detectProxySetting As String = GetSetting(AppName, "Credentials", "detectproxysettings", "0")
         If detectProxySetting = "1" Then
             ckbDetectProxy.Checked = True
@@ -647,5 +647,9 @@ Public Class frmRazor
         End Try
         Return True
     End Function
+
+    Private Sub btnAppToken_Click(sender As Object, e As EventArgs) Handles btnAppToken.Click
+        Process.Start("https://help.quickbase.com/user-assistance/app_tokens.html")
+    End Sub
 End Class
 
