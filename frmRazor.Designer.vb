@@ -44,6 +44,7 @@ Partial Class frmRazor
         Me.tvFields = New System.Windows.Forms.TreeView()
         Me.cmbPassword = New System.Windows.Forms.ComboBox()
         Me.btnAppToken = New System.Windows.Forms.Button()
+        Me.btnUserToken = New System.Windows.Forms.Button()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -115,7 +116,7 @@ Partial Class frmRazor
         'lblServer
         '
         Me.lblServer.AutoSize = True
-        Me.lblServer.Location = New System.Drawing.Point(390, 12)
+        Me.lblServer.Location = New System.Drawing.Point(404, 12)
         Me.lblServer.Name = "lblServer"
         Me.lblServer.Size = New System.Drawing.Size(93, 13)
         Me.lblServer.TabIndex = 30
@@ -123,9 +124,9 @@ Partial Class frmRazor
         '
         'txtServer
         '
-        Me.txtServer.Location = New System.Drawing.Point(390, 31)
+        Me.txtServer.Location = New System.Drawing.Point(407, 31)
         Me.txtServer.Name = "txtServer"
-        Me.txtServer.Size = New System.Drawing.Size(226, 20)
+        Me.txtServer.Size = New System.Drawing.Size(217, 20)
         Me.txtServer.TabIndex = 29
         '
         'txtPassword
@@ -206,11 +207,21 @@ Partial Class frmRazor
         Me.btnAppToken.Text = "?"
         Me.btnAppToken.UseVisualStyleBackColor = True
         '
+        'btnUserToken
+        '
+        Me.btnUserToken.Location = New System.Drawing.Point(381, 5)
+        Me.btnUserToken.Name = "btnUserToken"
+        Me.btnUserToken.Size = New System.Drawing.Size(19, 20)
+        Me.btnUserToken.TabIndex = 79
+        Me.btnUserToken.Text = "?"
+        Me.btnUserToken.UseVisualStyleBackColor = True
+        '
         'frmRazor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(864, 804)
+        Me.Controls.Add(Me.btnUserToken)
         Me.Controls.Add(Me.btnAppToken)
         Me.Controls.Add(Me.cmbPassword)
         Me.Controls.Add(Me.tvFields)
@@ -256,4 +267,5 @@ End Sub
     Friend WithEvents tvFields As TreeView
     Friend WithEvents cmbPassword As ComboBox
     Friend WithEvents btnAppToken As Button
+    Friend WithEvents btnUserToken As Button
 End Class

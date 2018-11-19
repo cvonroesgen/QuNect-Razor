@@ -7,7 +7,7 @@ Imports System.Text.RegularExpressions
 Imports System.Threading
 Public Class frmRazor
     Private Const AppName = "QuNectRazor"
-    Private Const qunectRazorVersion = "1.0.0.16"
+    Private Const qunectRazorVersion = "1.0.0.17"
     Private cmdLineArgs() As String
     Private automode As Boolean = False
     Private connectionString As String = ""
@@ -33,7 +33,7 @@ Public Class frmRazor
         txtUsername.Text = GetSetting(AppName, "Credentials", "username")
         cmbPassword.SelectedIndex = CInt(GetSetting(AppName, "Credentials", "passwordOrToken", "0"))
         txtPassword.Text = GetSetting(AppName, "Credentials", "password")
-        txtServer.Text = GetSetting(AppName, "Credentials", "server", "www.quickbase.com")
+        txtServer.Text = GetSetting(AppName, "Credentials", "server", "")
         txtAppToken.Text = GetSetting(AppName, "Credentials", "apptoken", "")
         Dim detectProxySetting As String = GetSetting(AppName, "Credentials", "detectproxysettings", "0")
         If detectProxySetting = "1" Then
@@ -195,8 +195,9 @@ Public Class frmRazor
         txtServer.Visible = txtPassword.Visible And txtPassword.Text.Length > 0
         lblServer.Visible = txtServer.Visible
         lblAppToken.Visible = cmbPassword.Visible And cmbPassword.SelectedIndex = 1
+        btnAppToken.Visible = lblAppToken.Visible
         txtAppToken.Visible = lblAppToken.Visible
-
+        btnUserToken.Visible = cmbPassword.Visible And cmbPassword.SelectedIndex = 2
     End Sub
 
     Private Sub txtServer_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtServer.TextChanged
@@ -651,5 +652,9 @@ Public Class frmRazor
     Private Sub btnAppToken_Click(sender As Object, e As EventArgs) Handles btnAppToken.Click
         Process.Start("https://help.quickbase.com/user-assistance/app_tokens.html")
     End Sub
+    Private Sub btnUserToken_Click(sender As Object, e As EventArgs) Handles btnUserToken.Click
+        Process.Start("https://qunect.com/flash/UserToken.html")
+    End Sub
+
 End Class
 
