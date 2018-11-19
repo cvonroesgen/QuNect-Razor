@@ -7,7 +7,7 @@ Imports System.Text.RegularExpressions
 Imports System.Threading
 Public Class frmRazor
     Private Const AppName = "QuNectRazor"
-    Private Const qunectRazorVersion = "1.0.0.13"
+    Private Const qunectRazorVersion = "1.0.0.15"
     Private cmdLineArgs() As String
     Private automode As Boolean = False
     Private connectionString As String = ""
@@ -20,11 +20,10 @@ Public Class frmRazor
     End Class
     Private qdbVer As qdbVersion = New qdbVersion
     Private fieldCharacterSettings = New ArrayList
-    Private sqlKeyWordDict As Dictionary(Of String, Boolean)
-    Private sqlKeyWords() As String = {"ADD", "ALL", "ALTER", "AND", "ANY", "AS", "ASC", "AVG", "BETWEEN", "BY", "CONSTRAINT", "COUNT", "CREATE", "CREATEOQ", "DELETE", "DELETEOQ", "DESC", "DISTINCT", "DROP", "EXISTS", "FOREIGN", "FROM", "GROUP", "HAVING", "IN", "INDEX", "INNER", "INSERT", "INSERTOQ", "INTO", "IS", "JOIN", "LEFT", "LIKE", "KEY", "MAX", "MIN", "NOT", "NULL", "ON", "OR", "ORDER", "OUTER", "PRIMARY", "REFERENCES", "SELECT", "SET", "SQL", "SUM", "TABLE", "TOP", "UNIQUE", "UPDATE", "UPDATEOQ", "USER", "VALUES", "WHERE"}
+
     Private Class tests
         Public Const dupes = "Check for Duplicate Column Names"
-        Public Const sqlKeyWords = "Check for SQL Keywords in Column Names"
+        Public Const findParsingProblems = "Check for SQL Parsing Errors caused by Column Names"
         Public Const empty = "Find Empty Columns"
         Public Const fields = "List non Report Link/Formula URL fields"
     End Class
@@ -42,23 +41,11 @@ Public Class frmRazor
         Else
             ckbDetectProxy.Checked = False
         End If
-        Dim samlSetting As String = GetSetting(AppName, "Credentials", "samlsetting", "0")
-        If samlSetting = "1" Then
-            ckbSSO.Checked = True
-        Else
-            ckbSSO.Checked = False
-        End If
+
 
 
         Dim myBuildInfo As FileVersionInfo = FileVersionInfo.GetVersionInfo(Application.ExecutablePath)
         Me.Text = "QuNect Razor " & qunectRazorVersion
-
-        sqlKeyWordDict = sqlKeyWords.ToDictionary(Function(value As String)
-                                                      Return value
-                                                  End Function,
-                   Function(value As String)
-                           Return True
-                       End Function)
 
         fieldCharacterSettings.Add("all")
         fieldCharacterSettings.Add("all characters")
@@ -74,7 +61,7 @@ Public Class frmRazor
         fieldCharacterSettings.Add("letters numbers underscores no colons")
         cmbTests.Items.Add("Choose an Analysis")
         cmbTests.Items.Add(tests.dupes)
-        cmbTests.Items.Add(tests.sqlKeyWords)
+        cmbTests.Items.Add(tests.findParsingProblems)
         cmbTests.Items.Add(tests.empty)
         cmbTests.Items.Add(tests.fields)
         cmbTests.SelectedIndex = 0
@@ -82,10 +69,12 @@ Public Class frmRazor
 
     Private Sub txtUsername_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtUsername.TextChanged
         SaveSetting(AppName, "Credentials", "username", txtUsername.Text)
+        showHideControls()
     End Sub
 
     Private Sub txtPassword_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtPassword.TextChanged
         SaveSetting(AppName, "Credentials", "password", txtPassword.Text)
+        showHideControls()
     End Sub
 
     Private Sub btnListTables_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnListTables.Click
@@ -200,10 +189,19 @@ Public Class frmRazor
         pb.Value = 0
         Me.Cursor = Cursors.Default
     End Sub
+    Sub showHideControls()
+        cmbPassword.Visible = txtUsername.Text.Length > 0
+        txtPassword.Visible = cmbPassword.Visible And cmbPassword.SelectedIndex <> 0
+        txtServer.Visible = txtPassword.Visible And txtPassword.Text.Length > 0
+        lblServer.Visible = txtServer.Visible
+        lblAppToken.Visible = cmbPassword.Visible And cmbPassword.SelectedIndex = 1
+        txtAppToken.Visible = lblAppToken.Visible
 
+    End Sub
 
     Private Sub txtServer_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtServer.TextChanged
         SaveSetting(AppName, "Credentials", "server", txtServer.Text)
+        showHideControls()
     End Sub
 
 
@@ -219,9 +217,7 @@ Public Class frmRazor
         If ckbDetectProxy.Checked Then
             buildConnectionString &= ";DETECTPROXY=1"
         End If
-        If ckbSSO.Checked Then
-            buildConnectionString &= ";SAML=1"
-        End If
+
         If appdbid.Length Then
             buildConnectionString &= ";APPID=" & appdbid & ";APPNAME=" & qdbAppName
         End If
@@ -335,6 +331,7 @@ Public Class frmRazor
     End Function
     Private Sub txtAppToken_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtAppToken.TextChanged
         SaveSetting(AppName, "Credentials", "apptoken", txtAppToken.Text)
+        showHideControls()
     End Sub
     Private Sub ckbDetectProxy_CheckStateChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ckbDetectProxy.CheckStateChanged
         If ckbDetectProxy.Checked Then
@@ -342,14 +339,9 @@ Public Class frmRazor
         Else
             SaveSetting(AppName, "Credentials", "detectproxysettings", "0")
         End If
+        showHideControls()
     End Sub
-    Private Sub ckbSSO_CheckStateChanged(sender As Object, e As EventArgs) Handles ckbSSO.CheckStateChanged
-        If ckbSSO.Checked Then
-            SaveSetting(AppName, "Credentials", "samlsetting", "1")
-        Else
-            SaveSetting(AppName, "Credentials", "samlsetting", "0")
-        End If
-    End Sub
+
     Private Sub ContextMenuStrip1_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles ContextMenuStrip1.ItemClicked
         If (qdbVer.year < 16) Or ((qdbVer.year = 16) And ((qdbVer.major <= 6) And (qdbVer.minor < 20))) Then
             MsgBox("To access this feature please install the latest version from http://qunect.com/download/QuNect.exe", MsgBoxStyle.OkOnly, AppName)
@@ -384,9 +376,9 @@ Public Class frmRazor
             If cmbTests.Text = tests.dupes Then
                 lblResult.Visible = True
                 findDupeColumnNames()
-            ElseIf cmbTests.Text = tests.sqlKeyWords Then
+            ElseIf cmbTests.Text = tests.findParsingProblems Then
                 lblResult.Visible = True
-                findSQLKeyWords()
+                findParsingProblems()
             ElseIf cmbTests.Text = tests.empty Then
                 lblResult.Visible = True
                 findEmptyFields()
@@ -486,38 +478,78 @@ Public Class frmRazor
         If Not quNectConn Is Nothing Then
             Dim restrictions(3) As String
             restrictions(2) = tvAppsTables.SelectedNode.Tag 'catalog, owner, table, column
-            Dim columns = quNectConn.GetSchema("Columns", restrictions)
+            Dim columns As DataTable = quNectConn.GetSchema("Columns", restrictions)
+            Dim ColumnsCausingParsingProblems = sendFieldNamesThroughParser(columns, quNectConn)
 
-            For i = 0 To columns.Rows.Count - 1
-                Application.DoEvents()
-                Dim ColumnName As String = columns.Rows(i)("COLUMN_NAME") 'index 3 for column name, index 11 for remarks has field type and then the fid
-                Dim wordsInColumnName() As String = ColumnName.Split(" ")
-                For Each word In wordsInColumnName
-                    If sqlKeyWordDict.ContainsKey(word.ToUpper) Then
-                        'now we have a problem
-                        colArray.Add(ColumnName & " contains " & word.ToUpper & ". " & columns.Rows(i)("REMARKS"))
-                    End If
-                Next
+            For i = 0 To ColumnsCausingParsingProblems.Count - 1
+                colArray.Add(ColumnsCausingParsingProblems(i) & " caused parsing problems.")
             Next
             quNectConn.Dispose()
         End If
         Return colArray
     End Function
-    Private Sub findSQLKeyWords()
-        Dim message As String = "Field names containing SQL keywords when spaces are not allowed." & vbCrLf
-        Dim colArray As ArrayList
-        colArray = findSQLKeyWordsForFieldSetting("lnu")
-        For Each col In colArray
-            message &= vbCrLf & col
+    Private Function sendFieldNamesThroughParser(columns As DataTable, connection As OdbcConnection) As ArrayList
+        Dim colArray As New ArrayList
+
+        For i = 0 To columns.Rows.Count - 1
+            Application.DoEvents()
+            Dim ColumnName As String = columns.Rows(i)("COLUMN_NAME") 'index 3 for column name, index 11 for remarks has field type and then the fid
+            colArray.Add(ColumnName)
+        Next i
+        'need to build a SQL SELECT from the column names
+        Return sendArrayOfFieldNamesToParser(colArray, connection)
+    End Function
+    Private Function sendArrayOfFieldNamesToParser(columns As ArrayList, connection As OdbcConnection) As ArrayList
+        Dim Sql As String = "SELECT "
+        Dim comma As String = ""
+        For i = 0 To columns.Count - 1
+            Sql &= comma & columns(i)
+            comma = ","
         Next
-        If colArray.Count = 0 Then
-            message = "No field names contain SQL keywords when spaces are not allowed." & vbCrLf
+        Sql &= " FROM """ & tvAppsTables.SelectedNode.Text & """"
+        If checkSQL(Sql, connection) Then
+            columns.Clear()
+            Return columns
+        ElseIf columns.Count = 1 Then
+            Return columns
+        Else
+
+            Dim firstHalfColumns As New ArrayList
+            Dim secondHalfColumns As New ArrayList
+            For i = 0 To columns.Count - 1
+                If i < columns.Count / 2 Then
+                    firstHalfColumns.Add(columns(i))
+                Else
+                    secondHalfColumns.Add(columns(i))
+                End If
+            Next
+            Dim firstBadColumns As ArrayList = sendArrayOfFieldNamesToParser(firstHalfColumns, connection)
+            Dim secondtBadColumns As ArrayList = sendArrayOfFieldNamesToParser(secondHalfColumns, connection)
+            For i = 0 To secondtBadColumns.Count - 1
+                firstBadColumns.Add(secondtBadColumns(i))
+            Next i
+            Return firstBadColumns
         End If
-        message &= vbCrLf & "Field names containing SQL keywords when spaces are allowed."
+    End Function
+    Private Sub findParsingProblems()
+        Dim colArray As ArrayList = findSQLKeyWordsForFieldSetting("lnu")
+        Dim message As String = "Field names causing parsing errors when spaces are not allowed." & vbCrLf
+        If colArray.count = 0 Then
+            message = "No field names cause parsing errors when spaces are not allowed." & vbCrLf
+        Else
+            For Each col In colArray
+                message &= col & vbCrLf
+            Next
+        End If
         colArray = findSQLKeyWordsForFieldSetting("all")
-        For Each col In colArray
-            message &= vbCrLf & col
-        Next
+        If colArray.Count = 0 Then
+            message &= "No field names cause parsing errors when spaces are allowed." & vbCrLf
+        Else
+            message &= "Field names causing parsing problems when spaces are allowed." & vbCrLf
+            For Each col In colArray
+                message &= col & vbCrLf
+            Next
+        End If
         lblResult.Text = message
     End Sub
     Private Sub findDupeColumnNames()
@@ -555,15 +587,7 @@ Public Class frmRazor
             Dim colUnique As New Dictionary(Of String, Boolean)
             For i = 0 To columns.Rows.Count - 1
                 Application.DoEvents()
-                Dim ColumnName As String = columns.Rows(i)("COLUMN_NAME") 'index 3 for column name, index 11 for remarks has field type and then the fid
-                If checkingUnalteredNames Then
-                    Dim wordsInColumnName() As String = ColumnName.Split(" ")
-                    For Each word In wordsInColumnName
-                        If sqlKeyWordDict.ContainsKey(word.ToUpper) Then
-                            'now we have a problem
-                        End If
-                    Next
-                End If
+                Dim ColumnName As String = columns.Rows(i)("COLUMN_NAME") 'index 3 for column name, index 11 for remarks has field type and then the fid              
                 If colUnique.ContainsKey(ColumnName) Then
                     If Not colDictionary.ContainsKey(ColumnName) Then
                         colDictionary.Add(ColumnName, True)
@@ -603,11 +627,25 @@ Public Class frmRazor
     End Function
     Private Sub cmbPassword_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbPassword.SelectedIndexChanged
         SaveSetting(AppName, "Credentials", "passwordOrToken", cmbPassword.SelectedIndex)
-        If cmbPassword.SelectedIndex = 0 Then
-            txtPassword.Enabled = False
-        Else
-            txtPassword.Enabled = True
-        End If
+        showHideControls()
     End Sub
+
+
+    Function checkSQL(Sql As String, Connection As OdbcConnection) As Boolean
+        Try
+            Using command As OdbcCommand = New OdbcCommand(Sql, Connection)
+                Try
+                    command.Prepare()
+                Catch e As Exception
+                    Throw New Exception("SQL parse error: " & Sql)
+                Finally
+                    command.Dispose()
+                End Try
+            End Using
+        Catch ex As Exception
+            Return False
+        End Try
+        Return True
+    End Function
 End Class
 

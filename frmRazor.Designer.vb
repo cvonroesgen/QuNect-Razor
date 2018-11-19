@@ -24,7 +24,6 @@ Partial Class frmRazor
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmRazor))
-        Me.ckbSSO = New System.Windows.Forms.CheckBox()
         Me.pb = New System.Windows.Forms.ProgressBar()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.ckbDetectProxy = New System.Windows.Forms.CheckBox()
@@ -46,16 +45,6 @@ Partial Class frmRazor
         Me.cmbPassword = New System.Windows.Forms.ComboBox()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'ckbSSO
-        '
-        Me.ckbSSO.AutoSize = True
-        Me.ckbSSO.Location = New System.Drawing.Point(541, 31)
-        Me.ckbSSO.Name = "ckbSSO"
-        Me.ckbSSO.Size = New System.Drawing.Size(70, 17)
-        Me.ckbSSO.TabIndex = 49
-        Me.ckbSSO.Text = "Use SSO"
-        Me.ckbSSO.UseVisualStyleBackColor = True
         '
         'pb
         '
@@ -125,7 +114,7 @@ Partial Class frmRazor
         'lblServer
         '
         Me.lblServer.AutoSize = True
-        Me.lblServer.Location = New System.Drawing.Point(295, 12)
+        Me.lblServer.Location = New System.Drawing.Point(390, 12)
         Me.lblServer.Name = "lblServer"
         Me.lblServer.Size = New System.Drawing.Size(93, 13)
         Me.lblServer.TabIndex = 30
@@ -133,17 +122,17 @@ Partial Class frmRazor
         '
         'txtServer
         '
-        Me.txtServer.Location = New System.Drawing.Point(295, 31)
+        Me.txtServer.Location = New System.Drawing.Point(390, 31)
         Me.txtServer.Name = "txtServer"
         Me.txtServer.Size = New System.Drawing.Size(226, 20)
         Me.txtServer.TabIndex = 29
         '
         'txtPassword
         '
-        Me.txtPassword.Location = New System.Drawing.Point(148, 31)
+        Me.txtPassword.Location = New System.Drawing.Point(193, 31)
         Me.txtPassword.Name = "txtPassword"
         Me.txtPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
-        Me.txtPassword.Size = New System.Drawing.Size(141, 20)
+        Me.txtPassword.Size = New System.Drawing.Size(187, 20)
         Me.txtPassword.TabIndex = 27
         '
         'lblUsername
@@ -159,7 +148,7 @@ Partial Class frmRazor
         '
         Me.txtUsername.Location = New System.Drawing.Point(10, 31)
         Me.txtUsername.Name = "txtUsername"
-        Me.txtUsername.Size = New System.Drawing.Size(120, 20)
+        Me.txtUsername.Size = New System.Drawing.Size(177, 20)
         Me.txtUsername.TabIndex = 25
         '
         'btnAnalyze
@@ -202,9 +191,9 @@ Partial Class frmRazor
         Me.cmbPassword.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cmbPassword.FormattingEnabled = True
         Me.cmbPassword.Items.AddRange(New Object() {"Please choose...", "QuickBase Password", "QuickBase User Token"})
-        Me.cmbPassword.Location = New System.Drawing.Point(148, 4)
+        Me.cmbPassword.Location = New System.Drawing.Point(193, 4)
         Me.cmbPassword.Name = "cmbPassword"
-        Me.cmbPassword.Size = New System.Drawing.Size(141, 21)
+        Me.cmbPassword.Size = New System.Drawing.Size(187, 21)
         Me.cmbPassword.TabIndex = 77
         '
         'frmRazor
@@ -217,7 +206,6 @@ Partial Class frmRazor
         Me.Controls.Add(Me.lblResult)
         Me.Controls.Add(Me.cmbTests)
         Me.Controls.Add(Me.btnAnalyze)
-        Me.Controls.Add(Me.ckbSSO)
         Me.Controls.Add(Me.pb)
         Me.Controls.Add(Me.ckbDetectProxy)
         Me.Controls.Add(Me.btnListTables)
@@ -237,7 +225,6 @@ Partial Class frmRazor
         Me.PerformLayout
 
 End Sub
-    Friend WithEvents ckbSSO As System.Windows.Forms.CheckBox
     Friend WithEvents pb As System.Windows.Forms.ProgressBar
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents ckbDetectProxy As System.Windows.Forms.CheckBox
