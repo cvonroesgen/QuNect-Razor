@@ -7,7 +7,7 @@ Imports System.Text.RegularExpressions
 Imports System.Threading
 Public Class frmRazor
     Private Const AppName = "QuNectRazor"
-    Private Const qunectRazorVersion = "1.0.0.18"
+    Private Const qunectRazorVersion = "1.0.0.19"
     Private cmdLineArgs() As String
     Private automode As Boolean = False
     Private connectionString As String = ""
@@ -210,6 +210,10 @@ Public Class frmRazor
         razor()
     End Sub
     Private Function buildConnectionString(fieldNameCharacters As String) As String
+        If txtPassword.Text.Contains(";") Then
+            Throw New System.Exception("Although Quick Base allows semicolons in passwords the ODBC standard does not permit semicolons." & vbCrLf & "Please change your Quick Base password to eliminate semicolons or use a Quick Base user token instead of a password.")
+            Return ""
+        End If
         buildConnectionString = "FIELDNAMECHARACTERS=" & fieldNameCharacters & ";uid=" & txtUsername.Text
         buildConnectionString &= ";pwd=" & txtPassword.Text
         buildConnectionString &= ";driver={QuNect ODBC for QuickBase};"
