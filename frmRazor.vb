@@ -7,7 +7,6 @@ Imports System.Text.RegularExpressions
 Imports System.Threading
 Public Class frmRazor
     Private Const AppName = "QuNectRazor"
-    Private Const qunectRazorVersion = "1.0.0.19"
     Private cmdLineArgs() As String
     Private automode As Boolean = False
     Private connectionString As String = ""
@@ -45,7 +44,7 @@ Public Class frmRazor
 
 
         Dim myBuildInfo As FileVersionInfo = FileVersionInfo.GetVersionInfo(Application.ExecutablePath)
-        Me.Text = "QuNect Razor " & qunectRazorVersion
+        Me.Text = "QuNect Razor " & myBuildInfo.ProductVersion
 
         fieldCharacterSettings.Add("all")
         fieldCharacterSettings.Add("all characters")
@@ -484,6 +483,13 @@ Public Class frmRazor
             Dim restrictions(3) As String
             restrictions(2) = tvAppsTables.SelectedNode.Tag 'catalog, owner, table, column
             Dim columns As DataTable = quNectConn.GetSchema("Columns", restrictions)
+            If columns.Rows.Count = 0 Then
+                If cmbPassword.SelectedIndex = 1 Then
+                    Throw New Exception("Could not find any columns! Please check your application token.")
+                Else
+                    Throw New Exception("Could not find any columns! Please check your user token.")
+                End If
+            End If
             Dim ColumnsCausingParsingProblems = sendFieldNamesThroughParser(columns, quNectConn)
 
             For i = 0 To ColumnsCausingParsingProblems.Count - 1
