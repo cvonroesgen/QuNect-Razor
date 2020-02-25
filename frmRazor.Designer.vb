@@ -27,10 +27,8 @@ Partial Class frmRazor
         Me.pb = New System.Windows.Forms.ProgressBar()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.ckbDetectProxy = New System.Windows.Forms.CheckBox()
-        Me.btnListTables = New System.Windows.Forms.Button()
         Me.RetrieveTheTableReportsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.tvAppsTables = New System.Windows.Forms.TreeView()
         Me.lblAppToken = New System.Windows.Forms.Label()
         Me.txtAppToken = New System.Windows.Forms.TextBox()
         Me.lblServer = New System.Windows.Forms.Label()
@@ -40,11 +38,12 @@ Partial Class frmRazor
         Me.txtUsername = New System.Windows.Forms.TextBox()
         Me.btnAnalyze = New System.Windows.Forms.Button()
         Me.cmbTests = New System.Windows.Forms.ComboBox()
-        Me.lblResult = New System.Windows.Forms.Label()
         Me.tvFields = New System.Windows.Forms.TreeView()
         Me.cmbPassword = New System.Windows.Forms.ComboBox()
         Me.btnAppToken = New System.Windows.Forms.Button()
         Me.btnUserToken = New System.Windows.Forms.Button()
+        Me.txtResult = New System.Windows.Forms.TextBox()
+        Me.cmbTables = New System.Windows.Forms.ComboBox()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -67,15 +66,6 @@ Partial Class frmRazor
         Me.ckbDetectProxy.Text = "Automatically detect proxy settings"
         Me.ckbDetectProxy.UseVisualStyleBackColor = True
         '
-        'btnListTables
-        '
-        Me.btnListTables.Location = New System.Drawing.Point(84, 121)
-        Me.btnListTables.Name = "btnListTables"
-        Me.btnListTables.Size = New System.Drawing.Size(211, 23)
-        Me.btnListTables.TabIndex = 34
-        Me.btnListTables.Text = "Show Tables You Have Access To"
-        Me.btnListTables.UseVisualStyleBackColor = True
-        '
         'RetrieveTheTableReportsToolStripMenuItem
         '
         Me.RetrieveTheTableReportsToolStripMenuItem.Name = "RetrieveTheTableReportsToolStripMenuItem"
@@ -87,15 +77,6 @@ Partial Class frmRazor
         Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RetrieveTheTableReportsToolStripMenuItem})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
         Me.ContextMenuStrip1.Size = New System.Drawing.Size(355, 26)
-        '
-        'tvAppsTables
-        '
-        Me.tvAppsTables.ContextMenuStrip = Me.ContextMenuStrip1
-        Me.tvAppsTables.Location = New System.Drawing.Point(10, 150)
-        Me.tvAppsTables.Name = "tvAppsTables"
-        Me.tvAppsTables.Size = New System.Drawing.Size(370, 642)
-        Me.tvAppsTables.TabIndex = 33
-        Me.tvAppsTables.Visible = False
         '
         'lblAppToken
         '
@@ -155,37 +136,27 @@ Partial Class frmRazor
         '
         'btnAnalyze
         '
-        Me.btnAnalyze.Location = New System.Drawing.Point(714, 122)
+        Me.btnAnalyze.Location = New System.Drawing.Point(756, 114)
         Me.btnAnalyze.Name = "btnAnalyze"
-        Me.btnAnalyze.Size = New System.Drawing.Size(107, 22)
+        Me.btnAnalyze.Size = New System.Drawing.Size(65, 22)
         Me.btnAnalyze.TabIndex = 50
         Me.btnAnalyze.Text = "Analyze"
         Me.btnAnalyze.UseVisualStyleBackColor = True
-        Me.btnAnalyze.Visible = False
         '
         'cmbTests
         '
         Me.cmbTests.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cmbTests.FormattingEnabled = True
-        Me.cmbTests.Location = New System.Drawing.Point(392, 122)
+        Me.cmbTests.Location = New System.Drawing.Point(494, 115)
         Me.cmbTests.Name = "cmbTests"
-        Me.cmbTests.Size = New System.Drawing.Size(316, 21)
+        Me.cmbTests.Size = New System.Drawing.Size(256, 21)
         Me.cmbTests.TabIndex = 51
-        Me.cmbTests.Visible = False
-        '
-        'lblResult
-        '
-        Me.lblResult.AutoSize = True
-        Me.lblResult.Location = New System.Drawing.Point(397, 154)
-        Me.lblResult.Name = "lblResult"
-        Me.lblResult.Size = New System.Drawing.Size(0, 13)
-        Me.lblResult.TabIndex = 52
         '
         'tvFields
         '
-        Me.tvFields.Location = New System.Drawing.Point(392, 150)
+        Me.tvFields.Location = New System.Drawing.Point(10, 142)
         Me.tvFields.Name = "tvFields"
-        Me.tvFields.Size = New System.Drawing.Size(429, 642)
+        Me.tvFields.Size = New System.Drawing.Size(809, 647)
         Me.tvFields.TabIndex = 53
         '
         'cmbPassword
@@ -216,22 +187,39 @@ Partial Class frmRazor
         Me.btnUserToken.Text = "?"
         Me.btnUserToken.UseVisualStyleBackColor = True
         '
+        'txtResult
+        '
+        Me.txtResult.Location = New System.Drawing.Point(10, 142)
+        Me.txtResult.MaxLength = 0
+        Me.txtResult.Multiline = True
+        Me.txtResult.Name = "txtResult"
+        Me.txtResult.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtResult.Size = New System.Drawing.Size(811, 644)
+        Me.txtResult.TabIndex = 80
+        '
+        'cmbTables
+        '
+        Me.cmbTables.FormattingEnabled = True
+        Me.cmbTables.Location = New System.Drawing.Point(10, 114)
+        Me.cmbTables.Name = "cmbTables"
+        Me.cmbTables.Size = New System.Drawing.Size(478, 21)
+        Me.cmbTables.TabIndex = 82
+        '
         'frmRazor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(864, 804)
+        Me.ClientSize = New System.Drawing.Size(831, 801)
+        Me.Controls.Add(Me.tvFields)
+        Me.Controls.Add(Me.cmbTables)
+        Me.Controls.Add(Me.txtResult)
         Me.Controls.Add(Me.btnUserToken)
         Me.Controls.Add(Me.btnAppToken)
         Me.Controls.Add(Me.cmbPassword)
-        Me.Controls.Add(Me.tvFields)
-        Me.Controls.Add(Me.lblResult)
         Me.Controls.Add(Me.cmbTests)
         Me.Controls.Add(Me.btnAnalyze)
         Me.Controls.Add(Me.pb)
         Me.Controls.Add(Me.ckbDetectProxy)
-        Me.Controls.Add(Me.btnListTables)
-        Me.Controls.Add(Me.tvAppsTables)
         Me.Controls.Add(Me.lblAppToken)
         Me.Controls.Add(Me.txtAppToken)
         Me.Controls.Add(Me.lblServer)
@@ -242,18 +230,16 @@ Partial Class frmRazor
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmRazor"
         Me.Text = "QuNect Razor"
-        Me.ContextMenuStrip1.ResumeLayout(false)
-        Me.ResumeLayout(false)
+        Me.ContextMenuStrip1.ResumeLayout(False)
+        Me.ResumeLayout(False)
         Me.PerformLayout
 
 End Sub
     Friend WithEvents pb As System.Windows.Forms.ProgressBar
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents ckbDetectProxy As System.Windows.Forms.CheckBox
-    Friend WithEvents btnListTables As System.Windows.Forms.Button
     Friend WithEvents RetrieveTheTableReportsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ContextMenuStrip1 As System.Windows.Forms.ContextMenuStrip
-    Friend WithEvents tvAppsTables As System.Windows.Forms.TreeView
     Friend WithEvents lblAppToken As System.Windows.Forms.Label
     Friend WithEvents txtAppToken As System.Windows.Forms.TextBox
     Friend WithEvents lblServer As System.Windows.Forms.Label
@@ -263,9 +249,10 @@ End Sub
     Friend WithEvents txtUsername As System.Windows.Forms.TextBox
     Friend WithEvents btnAnalyze As System.Windows.Forms.Button
     Friend WithEvents cmbTests As System.Windows.Forms.ComboBox
-    Friend WithEvents lblResult As System.Windows.Forms.Label
     Friend WithEvents tvFields As TreeView
     Friend WithEvents cmbPassword As ComboBox
     Friend WithEvents btnAppToken As Button
     Friend WithEvents btnUserToken As Button
+    Friend WithEvents txtResult As TextBox
+    Friend WithEvents cmbTables As ComboBox
 End Class

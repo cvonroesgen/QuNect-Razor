@@ -22,13 +22,13 @@ Public Class frmRazor
 
     Private Class tests
         Public Const dupes = "Check for Duplicate Column Names"
-        Public Const findParsingProblems = "Check for SQL Parsing Errors caused by Column Names"
+        Public Const findParsingProblems = "Check for SQL Parsing Errors due to Column Names"
         Public Const empty = "Find Empty Columns"
         Public Const fields = "List non Report Link/Formula URL fields"
     End Class
     Private Sub razor_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         tvFields.Visible = False
-        lblResult.Visible = False
+
         txtUsername.Text = GetSetting(AppName, "Credentials", "username")
         cmbPassword.SelectedIndex = CInt(GetSetting(AppName, "Credentials", "passwordOrToken", "0"))
         txtPassword.Text = GetSetting(AppName, "Credentials", "password")
@@ -64,6 +64,7 @@ Public Class frmRazor
         cmbTests.Items.Add(tests.empty)
         cmbTests.Items.Add(tests.fields)
         cmbTests.SelectedIndex = 0
+        listTables()
     End Sub
 
     Private Sub txtUsername_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtUsername.TextChanged
@@ -76,18 +77,15 @@ Public Class frmRazor
         showHideControls()
     End Sub
 
-    Private Sub btnListTables_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnListTables.Click
-        qdbAppName = ""
-        appdbid = ""
-        listTables()
-    End Sub
+
     Private Sub listTables()
         Me.Cursor = Cursors.WaitCursor
-
+        qdbAppName = ""
+        appdbid = ""
 
         Dim quNectConn As OdbcConnection = getquNectConn("all")
         If Not quNectConn Is Nothing Then
-            tvAppsTables.Visible = True
+            cmbTables.Visible = True
             Dim tables As DataTable = quNectConn.GetSchema("Tables")
             listTablesFromGetSchema(tables)
             quNectConn.Dispose()
@@ -151,9 +149,9 @@ Public Class frmRazor
             End Try
         Next
 
-        tvAppsTables.BeginUpdate()
-        tvAppsTables.Nodes.Clear()
-        tvAppsTables.ShowNodeToolTips = True
+        cmbTables.BeginUpdate()
+        cmbTables.Items.Clear()
+        cmbTables.Items.Add("Please choose a table.")
         Dim dbName As String
         Dim applicationName As String = ""
         Dim prevAppName As String = ""
@@ -170,22 +168,17 @@ Public Class frmRazor
             applicationName = tables.Rows(i)(0)
             Dim dbidMatch As Match = getDBIDfromdbName.Match(dbName)
             dbid = dbidMatch.Value
-            If applicationName <> prevAppName Then
-                Dim appNode As TreeNode = tvAppsTables.Nodes.Add(applicationName)
-                appNode.ToolTipText = "Right click me to get all my table reports as well as tables!"
-                appNode.Tag = dbid
-                prevAppName = applicationName
-            End If
+
             Dim tableName As String = dbName
             If appdbid.Length = 0 And dbName.Length > applicationName.Length Then
                 tableName = dbName.Substring(applicationName.Length + 2)
             End If
-            Dim tableNode As TreeNode = tvAppsTables.Nodes(tvAppsTables.Nodes.Count - 1).Nodes.Add(tableName)
-            tableNode.Tag = dbid
+            cmbTables.Items.Add(tableName)
         Next
         pb.Visible = False
-        tvAppsTables.EndUpdate()
+        cmbTables.EndUpdate()
         pb.Value = 0
+        cmbTables.SelectedIndex = 0
         Me.Cursor = Cursors.Default
     End Sub
     Sub showHideControls()
@@ -345,76 +338,54 @@ Public Class frmRazor
         End If
         showHideControls()
     End Sub
-
-    Private Sub ContextMenuStrip1_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles ContextMenuStrip1.ItemClicked
-        If (qdbVer.year < 16) Or ((qdbVer.year = 16) And ((qdbVer.major <= 6) And (qdbVer.minor < 20))) Then
-            MsgBox("To access this feature please install the latest version from http://qunect.com/download/QuNect.exe", MsgBoxStyle.OkOnly, AppName)
-            Exit Sub
-        End If
-        'here we need to reconnect with the appid in the connection string
-        If tvAppsTables.SelectedNode Is Nothing Then
-            Exit Sub
-        End If
-        appdbid = tvAppsTables.SelectedNode.Tag
-        qdbAppName = tvAppsTables.SelectedNode.Text
-        listTables()
-    End Sub
-
-    Private Sub tvAppsTables_NodeMouseClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles tvAppsTables.NodeMouseClick
-        If e.Node.Level <> 0 Then
-            btnAnalyze.Visible = True
-            cmbTests.Visible = True
-            tvAppsTables.SelectedNode = e.Node
-            Exit Sub
-        End If
-
-
-    End Sub
-
     Private Sub btnAnalyze_Click(sender As Object, e As EventArgs) Handles btnAnalyze.Click
-        lblResult.Visible = False
+        txtResult.Visible = False
         tvFields.Visible = False
         Me.Cursor = Cursors.WaitCursor
         Application.DoEvents()
         Try
-            If cmbTests.Text = tests.dupes Then
-                lblResult.Visible = True
+            If cmbTables.SelectedIndex = 0 Then
+                MsgBox("Please Choose a Table", MsgBoxStyle.OkOnly, AppName)
+            ElseIf cmbTests.Text = tests.dupes Then
+                txtResult.Visible = True
                 findDupeColumnNames()
             ElseIf cmbTests.Text = tests.findParsingProblems Then
-                lblResult.Visible = True
+                txtResult.Visible = True
                 findParsingProblems()
             ElseIf cmbTests.Text = tests.empty Then
-                lblResult.Visible = True
+                txtResult.Visible = True
                 findEmptyFields()
             ElseIf cmbTests.Text = tests.fields Then
                 tvFields.Visible = True
                 listFields()
             Else
-                MsgBox("Please Choose a Test", MsgBoxStyle.OkOnly, AppName)
+                MsgBox("Please Choose an Analysis", MsgBoxStyle.OkOnly, AppName)
             End If
         Catch ex As Exception
             MsgBox("Sorry we could not perform your analysis because: " & ex.Message, MsgBoxStyle.OkOnly, AppName)
         End Try
         Me.Cursor = Cursors.Default
-        tvAppsTables.Focus()
+        cmbTables.Focus()
     End Sub
     Private Sub findEmptyFields()
         Dim colArray As New ArrayList
         Dim quNectConn As OdbcConnection = getquNectConn("all;IGNOREDUPEFIELDNAMES=1;TEXTNULL=1")
         Dim rowcount = 0
+        Dim dbid As String = cmbTables.Items(cmbTables.SelectedIndex)
+        dbid = dbid.Split(" ")(dbid.Split(" ").Length - 1)
         If Not quNectConn Is Nothing Then
             Dim restrictions(3) As String
-            restrictions(2) = tvAppsTables.SelectedNode.Tag 'catalog, owner, table, column
+            restrictions(2) = dbid 'catalog, owner, table, column
             Dim columns = quNectConn.GetSchema("Columns", restrictions)
             Dim findBooleans As Regex = New Regex("Checkbox", RegexOptions.IgnoreCase)
-            Dim quickBaseSQL As String = "SELECT count(1) from [" & tvAppsTables.SelectedNode.Tag & "]"
+            Dim quickBaseSQL As String = "SELECT count(1) from [" & dbid & "]"
             Dim quNectCmd = New OdbcCommand(quickBaseSQL, quNectConn)
             Try
                 Dim dr = quNectCmd.ExecuteReader()
                 dr.Read()
                 rowcount = dr.GetValue(0)
                 If rowcount = 0 Then
-                    lblResult.Text = "There are no rows in " & tvAppsTables.SelectedNode.Text
+                    txtResult.Text = "There are no rows in " & cmbTables.Items(cmbTables.SelectedIndex)
                     Exit Sub
                 End If
             Catch excpt As Exception
@@ -448,10 +419,13 @@ Public Class frmRazor
         For Each col In colArray
             message &= vbCrLf & col
         Next
-        lblResult.Text = "Out of the " & rowcount & " rows you have access to, the following columns have no data." & vbCrLf & message
+        txtResult.Text = "Out of the " & rowcount & " rows you have access to, the following columns have no data." & vbCrLf & message
     End Sub
     Private Sub listFields()
         Me.Cursor = Cursors.WaitCursor
+        Dim dbid As String = cmbTables.Items(cmbTables.SelectedIndex)
+        dbid = dbid.Split(" ")(dbid.Split(" ").Length - 1)
+
         Dim columnNames As New ArrayList
         getAllTypesOfColumnNames(columnNames)
         Dim quNectConn As OdbcConnection = getquNectConn("all;IGNOREDUPEFIELDNAMES=1;TEXTNULL=1")
@@ -460,7 +434,7 @@ Public Class frmRazor
         tvFields.Nodes.Clear()
         If Not quNectConn Is Nothing Then
             Dim restrictions(3) As String
-            restrictions(2) = tvAppsTables.SelectedNode.Tag 'catalog, owner, table, column
+            restrictions(2) = dbid 'catalog, owner, table, column
             Dim columns = quNectConn.GetSchema("Columns", restrictions)
             For i = 0 To columns.Rows.Count - 1
                 Application.DoEvents()
@@ -479,9 +453,12 @@ Public Class frmRazor
     Private Function findSQLKeyWordsForFieldSetting(fieldCharaterSetting As String) As ArrayList
         Dim colArray As New ArrayList
         Dim quNectConn As OdbcConnection = getquNectConn(fieldCharaterSetting & ";IGNOREDUPEFIELDNAMES=1")
+        Dim dbid As String = cmbTables.Items(cmbTables.SelectedIndex)
+        dbid = dbid.Split(" ")(dbid.Split(" ").Length - 1)
+
         If Not quNectConn Is Nothing Then
             Dim restrictions(3) As String
-            restrictions(2) = tvAppsTables.SelectedNode.Tag 'catalog, owner, table, column
+            restrictions(2) = dbid 'catalog, owner, table, column
             Dim columns As DataTable = quNectConn.GetSchema("Columns", restrictions)
             If columns.Rows.Count = 0 Then
                 If cmbPassword.SelectedIndex = 1 Then
@@ -513,11 +490,14 @@ Public Class frmRazor
     Private Function sendArrayOfFieldNamesToParser(columns As ArrayList, connection As OdbcConnection) As ArrayList
         Dim Sql As String = "SELECT "
         Dim comma As String = ""
+        Dim dbid As String = cmbTables.Items(cmbTables.SelectedIndex)
+        dbid = dbid.Split(" ")(dbid.Split(" ").Length - 1)
+
         For i = 0 To columns.Count - 1
             Sql &= comma & columns(i)
             comma = ","
         Next
-        Sql &= " FROM """ & tvAppsTables.SelectedNode.Text & """"
+        Sql &= " FROM """ & dbid & """"
         If checkSQL(Sql, connection) Then
             columns.Clear()
             Return columns
@@ -545,7 +525,7 @@ Public Class frmRazor
     Private Sub findParsingProblems()
         Dim colArray As ArrayList = findSQLKeyWordsForFieldSetting("lnu")
         Dim message As String = "Field names causing parsing errors when spaces are not allowed." & vbCrLf
-        If colArray.count = 0 Then
+        If colArray.Count = 0 Then
             message = "No field names cause parsing errors when spaces are not allowed." & vbCrLf
         Else
             For Each col In colArray
@@ -561,7 +541,7 @@ Public Class frmRazor
                 message &= col & vbCrLf
             Next
         End If
-        lblResult.Text = message
+        txtResult.Text = message
     End Sub
     Private Sub findDupeColumnNames()
         Dim message As String = ""
@@ -580,16 +560,19 @@ Public Class frmRazor
                 message &= fieldCharacterSettings(i + 1) & ":" & vbCrLf & vbTab & "No Duplicates" & vbCrLf & vbCrLf
             End If
         Next
-        lblResult.Text = "Duplicate field names are listed below for each field character replacement setting." & vbCrLf & vbCrLf & message
+        txtResult.Text = "Duplicate field names are listed below for each field character replacement setting." & vbCrLf & vbCrLf & message
     End Sub
     Private Function findDupeColumnNamesForFieldSetting(fieldCharacterSetting As String, fieldCharacterSettingDescription As String, ByRef columns As DataTable, ByRef allCharacterColumns As DataTable) As ArrayList
         Dim quNectConn As OdbcConnection = getquNectConn(fieldCharacterSetting & ";IGNOREDUPEFIELDNAMES=1")
         Dim colDictionary = New Dictionary(Of String, Boolean)
         Dim colArray As New ArrayList
         Dim checkingUnalteredNames = False
+        Dim dbid As String = cmbTables.Items(cmbTables.SelectedIndex)
+        dbid = dbid.Split(" ")(dbid.Split(" ").Length - 1)
+
         If Not quNectConn Is Nothing Then
             Dim restrictions(3) As String
-            restrictions(2) = tvAppsTables.SelectedNode.Tag 'catalog, owner, table, column
+            restrictions(2) = dbid 'catalog, owner, table, column
             columns = quNectConn.GetSchema("Columns", restrictions)
             If allCharacterColumns Is Nothing Then
                 allCharacterColumns = columns
@@ -629,9 +612,11 @@ Public Class frmRazor
     End Sub
     Private Function getColumnNamesForFieldSetting(fieldCharacterSetting As String) As DataTable
         Dim quNectConn As OdbcConnection = getquNectConn(fieldCharacterSetting & ";IGNOREDUPEFIELDNAMES=1")
+        Dim dbid As String = cmbTables.Items(cmbTables.SelectedIndex)
+        dbid = dbid.Split(" ")(dbid.Split(" ").Length - 1)
 
         Dim restrictions(3) As String
-        restrictions(2) = tvAppsTables.SelectedNode.Tag 'catalog, owner, table, column
+        restrictions(2) = dbid 'catalog, owner, table, column
         getColumnNamesForFieldSetting = quNectConn.GetSchema("Columns", restrictions)
         quNectConn.Dispose()
 
@@ -664,6 +649,13 @@ Public Class frmRazor
     End Sub
     Private Sub btnUserToken_Click(sender As Object, e As EventArgs) Handles btnUserToken.Click
         Process.Start("https://qunect.com/flash/UserToken.html")
+    End Sub
+
+    Private Sub frmRazor_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        txtResult.Height = Me.ClientSize.Height - txtResult.Top - txtResult.Left
+        txtResult.Width = Me.ClientSize.Width - txtResult.Left - txtResult.Left
+        tvFields.Height = Me.ClientSize.Height - tvFields.Top - tvFields.Left
+        tvFields.Width = Me.ClientSize.Width - tvFields.Left - tvFields.Left
     End Sub
 
 End Class
